@@ -671,7 +671,7 @@ const transform = function(original_options = {}) {
               this.state.bufBytesStart += bomLength;
               buf = buf.slice(bomLength);
               // Renormalize original options with the new encoding
-              this.options = normalize_options({...this.original_options, encoding: encoding});
+              this.options = normalize_options(Object.assign(this.original_options, {encoding: encoding}));
               // Options will re-evaluate the Buffer with the new encoding
               ({comment, escape, quote } = this.options);
               break;
@@ -1258,26 +1258,21 @@ const transform = function(original_options = {}) {
       }
     },
     __infoDataSet: function(){
-      return {
-        ...this.info,
-        columns: this.options.columns
-      };
+      return Object.assign(this.info, { columns: this.options.columns });
     },
     __infoRecord: function(){
       const {columns, raw, encoding} = this.options;
-      return {
-        ...this.__infoDataSet(),
+      return Object.assign(this.__infoDataSet(), {
         error: this.state.error,
         header: columns === true,
         index: this.state.record.length,
         raw: raw ? this.state.rawBuffer.toString(encoding) : undefined
-      };
+      });
     },
     __infoField: function(){
       const {columns} = this.options;
       const isColumns = Array.isArray(columns);
-      return {
-        ...this.__infoRecord(),
+      return Object.assign(this.__infoRecord(), {
         column: isColumns === true ?
           (columns.length > this.state.record.length ?
             columns[this.state.record.length].name :
@@ -1285,14 +1280,14 @@ const transform = function(original_options = {}) {
           ) :
           this.state.record.length,
         quoting: this.state.wasQuoting,
-      };
+      });
     }
   };
 };
 
 class Parser extends stream.Transform {
   constructor(opts = {}){
-    super({...{readableObjectMode: true}, ...opts, encoding: null});
+    super(Object.assign(opts, {readableObjectMode: true, encoding: null}));
     this.api = transform(opts);
     this.api.options.on_skip = (err, chunk) => {
       this.emit('skip', err, chunk);

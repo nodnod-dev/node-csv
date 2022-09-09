@@ -9,7 +9,7 @@
 
 </pre>
 
-# CSV packages for Node.js and the web
+# CSV packages for Node.js and the web (edited to work within Sanity)
 
 This project provides CSV generation, parsing, transformation and serialization for Node.js.
 
